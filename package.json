@@ -1,0 +1,23 @@
+{
+  "name": "com.funbites.localization",
+  "version": "0.0.2",
+  "displayName": "Funbites Localization",
+  "description": "Localization library for multiple language support.",
+  "unity": "2019.3",
+  "unityRelease": "3f1",
+  "dependencies": {
+    "com.funbites.codepatterns": "0.0.2",
+	"com.unity.textmeshpro": "2.0.1",
+	"com.unity.addressables": "1.8.3"
+  },
+  "keywords": [
+    "localization",
+	"language"
+  ],
+  "author": {
+    "name": "Funbites Game Studio",
+    "email": "funbitesgames@gmail.com",
+    "url": "https://www.funbites.com.br"
+  },
+  "type": "library"
+}
