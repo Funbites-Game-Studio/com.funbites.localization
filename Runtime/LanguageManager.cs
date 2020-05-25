@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.AddressableAssets;
-
-namespace Funbites.Localization {
+﻿namespace Funbites.Localization {
     public class LanguageManager {
         #region Singleton
         private static LanguageManager _instance;
@@ -19,13 +13,6 @@ namespace Funbites.Localization {
                 return _instance;
             }
         }
-        
-        
-        /*
-        public static bool TryToGetValue(string key, out string value) {
-            return Instance.TryToGetValueImplementation(key, out value);
-        }
-        */
         #endregion
 
 
@@ -33,9 +20,9 @@ namespace Funbites.Localization {
         public bool IsLoading { get; private set; } = false;
         public bool HasLoadedLanguage { get; private set; } = false;
         public string LoadedLanguage { get; private set; } = null;
-        public Action OnUpdateLanguage { get; internal set; } = null;
+        public System.Action OnUpdateLanguage { get; internal set; } = null;
 
-        private Dictionary<string, string> loadedData;
+        private System.Collections.Generic.Dictionary<string, string> loadedData;
         private LanguageManager() {
             loadedData = null;
             HasLoadedLanguage = false;
@@ -45,14 +32,14 @@ namespace Funbites.Localization {
 
         private const string LanguageManagerLoaderAddress = "_LANGUAGE_MANAGER_LOADER";
 
-        public void LoadLanguage(MonoBehaviour caller, string language) {
+        public void LoadLanguage(UnityEngine.MonoBehaviour caller, string language) {
 #if UNITY_EDITOR
-            if (Application.isEditor && !Application.isPlaying) {
+            if (UnityEngine.Application.isEditor && !UnityEngine.Application.isPlaying) {
                 IsLoading = true;
                 try {
                     var aaSettings = UnityEditor.AddressableAssets.AddressableAssetSettingsDefaultObject.GetSettings(true);
                     UnityEditor.AddressableAssets.Settings.AddressableAssetEntry foundEntry = null;
-                    var assetsList = new List<UnityEditor.AddressableAssets.Settings.AddressableAssetEntry>(2048);
+                    var assetsList = new System.Collections.Generic.List<UnityEditor.AddressableAssets.Settings.AddressableAssetEntry>(2048);
                     aaSettings.GetAllAssets(assetsList, false);
                     foreach (var entry in assetsList) {
                         if (entry.address == LanguageManagerLoaderAddress) {
@@ -68,31 +55,31 @@ namespace Funbites.Localization {
                     loadedData = loadedLanguageData.GetData();
                     HasLoadedLanguage = true;
                     LoadedLanguage = language;
-                } catch (Exception e) {
-                    Debug.LogException(e);
+                } catch (System.Exception e) {
                     IsLoading = false;
+                    throw e;
                 }
             }
 #endif
-            if (Application.isPlaying)
+            if (UnityEngine.Application.isPlaying)
                 caller.StartCoroutine(LoadLanguageCoroutine(language));
         }
 
-        private IEnumerator LoadLanguageCoroutine(string language) {
+        private System.Collections.IEnumerator LoadLanguageCoroutine(string language) {
             IsLoading = true;
             HasLoadedLanguage = false;
             if (languageLoader == null) {
-                var languageLoaderAsyncOperation = Addressables.LoadAssetAsync<LanguageLoader>(LanguageManagerLoaderAddress);
+                var languageLoaderAsyncOperation = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<LanguageLoader>(LanguageManagerLoaderAddress);
                 while (!languageLoaderAsyncOperation.IsDone) yield return null;
                 languageLoader = languageLoaderAsyncOperation.Result;
-                Addressables.Release(languageLoaderAsyncOperation);
+                UnityEngine.AddressableAssets.Addressables.Release(languageLoaderAsyncOperation);
             }
             if (languageLoader != null) {
                 var languageAssetReference = languageLoader.FindAssetReferenceForLanguage(language);
                 var languageLoading = languageAssetReference.LoadAssetAsync();
                 while (!languageLoading.IsDone) yield return null;
                 loadedData = languageLoading.Result.GetData();
-                Addressables.Release(languageLoading);
+                UnityEngine.AddressableAssets.Addressables.Release(languageLoading);
                 HasLoadedLanguage = true;
                 LoadedLanguage = language;
                 IsLoading = false;

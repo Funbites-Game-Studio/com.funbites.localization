@@ -1,13 +1,8 @@
-﻿using Sirenix.OdinInspector;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using UnityEngine;
-
-namespace Funbites.Localization {
-    
+﻿namespace Funbites.Localization {
     public class TMP_Text_MultiLanguage : TMP_Text_Base {
-        [SerializeField, Required, ValidateInput("CheckKey", "Key was not found in language manager default language")]
+        [UnityEngine.SerializeField]
+        [Sirenix.OdinInspector.Required]
+        [Sirenix.OdinInspector.ValidateInput("CheckKey", "Key was not found in language manager default language")]
         private string m_key = "KEY";
         
         private static bool CheckKey(string key) {
