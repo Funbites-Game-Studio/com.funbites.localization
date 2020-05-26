@@ -1,5 +1,5 @@
 ﻿namespace Funbites.Localization {
-    [UnityEngine.CreateAssetMenu(menuName ="Localization/Language Loader")]
+    [UnityEngine.CreateAssetMenu(menuName ="Funbites/Localization/Language Loader")]
     public class LanguageLoader : UnityEngine.ScriptableObject
     {
         public const string DefaultLanguage = "en";
