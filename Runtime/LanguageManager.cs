@@ -30,6 +30,25 @@
             languageLoader = null;
         }
 
+        public string FindDeviceCultureName()
+        {
+            string result = System.Globalization.CultureInfo.CurrentCulture.Name;
+#if UNITY_EDITOR
+
+#elif UNITY_ANDROID
+            using (UnityEngine.AndroidJavaClass cls = new UnityEngine.AndroidJavaClass("java.util.Locale")) {
+                using (UnityEngine.AndroidJavaObject locale = cls.CallStatic<UnityEngine.AndroidJavaObject>("getDefault")) {
+                    result = locale.Call<string>("getLanguage")+"-"+locale.Call<string>("getCountry");
+                }
+            }
+#elif UNITY_IOS
+            
+#else
+            
+#endif
+            return result;
+        }
+
         private const string LanguageManagerLoaderAddress = "_LANGUAGE_MANAGER_LOADER";
 
         public void LoadLanguage(UnityEngine.MonoBehaviour caller, string language) {

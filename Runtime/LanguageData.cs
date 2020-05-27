@@ -22,12 +22,15 @@
         private bool IsApplicationPlaying => UnityEngine.Application.isPlaying;
 
         [Sirenix.OdinInspector.Button(Style = Sirenix.OdinInspector.ButtonStyle.CompactBox, Expanded = true)]
-        private void Synchronize(LanguageData otherLanguage) {
-            if (otherLanguage == null) {
+        private void Synchronize(LanguageData otherLanguage)
+        {
+            if (otherLanguage == null)
+            {
                 UnityEditor.EditorUtility.DisplayDialog("Synchronization - Error", "Please, select a file", "Ok");
                 return;
             }
-            if (otherLanguage == this) {
+            if (otherLanguage == this)
+            {
                 UnityEditor.EditorUtility.DisplayDialog("Synchronization - Error", "You are trying to synchronize with the same file.", "Ok");
                 return;
             }
@@ -39,38 +42,105 @@
             removedKeys.ExceptWith(otherKeys);
             bool hasRemovedKeys = removedKeys.Count > 0;
             bool hasAddedKeys = addedKeys.Count > 0;
-            if (!hasRemovedKeys && !hasAddedKeys) {
+            if (!hasRemovedKeys && !hasAddedKeys)
+            {
                 UnityEditor.EditorUtility.DisplayDialog("Synchronization", "File is syncronized", "Ok");
                 return;
             }
-            
-            if (hasRemovedKeys) {
-                var message = new System.Text.StringBuilder($"The following {removedKeys.Count} key(s) were not present in the other language {otherLanguage.name} but it's in this language {name}:\n");
-                foreach (string key in removedKeys) {
-                    message.Append(key);
-                    message.Append("\n");
-                }
-                message.Append("Do you want to remove from this file?");
-                if (UnityEditor.EditorUtility.DisplayDialog("Synchronization - Removing", message.ToString(), "Yes", "No")) {
-                    foreach (string key in removedKeys) {
+
+            if (hasRemovedKeys)
+            {
+
+
+                if (UnityEditor.EditorUtility.DisplayDialog("Synchronization - Removing",
+                    BuildSynchonizationMessage($"The following {removedKeys.Count.ToString()} key(s) were not present in the other language {otherLanguage.name} but it's in this language {name}:",
+                    removedKeys, "Do you want to remove from this file?"), "Yes", "No"))
+                {
+                    foreach (string key in removedKeys)
+                    {
                         dataDic.Remove(key);
                     }
                 }
             }
-            if (hasAddedKeys) {
-                var message = new System.Text.StringBuilder($"The following {addedKeys.Count} key(s) were present in the other language {otherLanguage.name} but  it's not in this language {name}:\n");
-                foreach (string key in addedKeys) {
-                    message.Append(key);
-                    message.Append("\n");
-                }
-                message.Append("Do you want to add from this file?");
-                if (UnityEditor.EditorUtility.DisplayDialog("Synchronization - Adding", message.ToString(), "Yes", "No")) {
-                    foreach (string key in addedKeys) {
+            if (hasAddedKeys)
+            {
+                if (UnityEditor.EditorUtility.DisplayDialog("Synchronization - Adding",
+                    BuildSynchonizationMessage($"The following {addedKeys.Count.ToString()} key(s) were present in the other language {otherLanguage.name} but  it's not in this language {name}:",
+                    addedKeys, "Do you want to add from this file?"), "Yes", "No"))
+                {
+                    foreach (string key in addedKeys)
+                    {
                         dataDic.Add(key, otherLanguage.dataDic[key]);
                     }
                 }
             }
             UnityEditor.AssetDatabase.SaveAssets();
+        }
+
+        private const int maxCharPerLine = 200;
+        private string BuildSynchonizationMessage(string statement, System.Collections.Generic.HashSet<string> elements, string question)
+        {
+            var message = new System.Text.StringBuilder();
+            message.Append(statement);
+            message.Append("\n");
+            int charCountPerLine = 0;
+            foreach (string key in elements)
+            {
+                message.Append(key);
+                charCountPerLine += key.Length + 1;
+                if (charCountPerLine < maxCharPerLine)
+                {
+                    message.Append(";");
+                } else
+                {
+                    message.Append(";\n");
+                    charCountPerLine = 0;
+                }
+            }
+            message.Append(question);
+            message.Append("\n");
+            return message.ToString();
+        }
+
+        private static readonly char[] commaSeparetor = new char[] { ',' };
+        [Sirenix.OdinInspector.Button]
+        private void AddKeysInBatchWithCommaSeparetor(string keys, string prefixes = "", string suffixes = "")
+        {
+            AddKeysInBatchWithSeparetor(keys, prefixes, suffixes, commaSeparetor);
+        }
+
+        [Sirenix.OdinInspector.Button]
+        private void AddKeysInBatchWithSeparetor(string keys, string prefixes, string suffixes, char[] separetor)
+        {
+            string[] keysArray = keys.Split(separetor);
+            string[] prefixesArray = prefixes.Split(separetor);
+            string[] suffixesArray = suffixes.Split(separetor);
+            var sb = new System.Text.StringBuilder();
+            string newKey, curKey;
+            foreach (var key in keysArray)
+            {
+                sb.Clear();
+                curKey = key.Trim();
+                foreach (var prefix in prefixesArray)
+                {
+                    sb.Append(prefix.Trim());
+                    sb.Append(key);
+                    foreach (var suffix in suffixesArray)
+                    {
+                        sb.Append(suffix.Trim());
+                        newKey = System.Text.RegularExpressions.Regex.Replace(sb.ToString().ToUpperInvariant(), allSpacesPattern, "");
+                        if (dataDic.ContainsKey(newKey))
+                        {
+                            UnityEngine.Debug.LogError($"Key {newKey} is already on language data");
+                        } else
+                        {
+                            dataDic.Add(newKey, newKey);
+                        }
+                        sb.Remove(sb.Length - suffix.Length, suffix.Length);
+                    }
+                    sb.Clear();
+                }
+            }
         }
 
         private System.Collections.Generic.HashSet<string> GetKeys() {
@@ -98,7 +168,7 @@
             }
 #endif
         }
-
+        private const string allSpacesPattern = @"\s+";
         public void OnBeforeSerialize() {
 #if UNITY_EDITOR
             if (dataDic == null) {
@@ -109,7 +179,7 @@
             _data = new string[dataDic.Count * 2];
             int i = 0;
             foreach (var datum in dataDic) {
-                _data[i++] = System.Text.RegularExpressions.Regex.Replace(datum.Key.ToUpperInvariant(), @"s", "");
+                _data[i++] = System.Text.RegularExpressions.Regex.Replace(datum.Key.ToUpperInvariant(), allSpacesPattern, "");
                 _data[i++] = datum.Value;
             }
 #endif
