@@ -120,5 +120,20 @@
             return loadedData.TryGetValue(key, out value);
         }
 
+        public string GetValue(string key, string defaultValue = "")
+        {
+            string result;
+            if (TryToGetValue(key, out result))
+            {
+                return result;
+            }
+            return defaultValue;
+        }
+
+        public string this[string key] { get {
+                return GetValue(key);
+            }
+        }
+
     }
 }
