@@ -1,6 +1,5 @@
 ﻿namespace Funbites.Localization {
     using Sirenix.OdinInspector;
-    using Sirenix.OdinInspector.Editor;
     using System;
     using System.Collections.Generic;
     using UnityEditor;
@@ -55,7 +54,7 @@
         }
 
         //TODO: Improve performance of Dictionary view...
-        public class LocalizedStringValueDrawer : OdinValueDrawer<LocalizedStringValue>
+        public class LocalizedStringValueDrawer : Sirenix.OdinInspector.Editor.OdinValueDrawer<LocalizedStringValue>
         {
             LocalizedStringValue value;
 
@@ -63,7 +62,6 @@
             {
                 
                 value = ValueEntry.SmartValue;
-                var textAreaStyle = EditorStyles.textArea;
                 
                 if (value.Operation == LocalizedStringValueOperation.Remove)
                 {
@@ -128,7 +126,6 @@
 
             newValue = newValue.ToUpperInvariant();
             string[] possibleValues = newValue.Split(spaceSeparetor);
-            //int end = _data.Length / 2;
             int end = _data.Count / 2;
             string key, value;
             int k = 0;
@@ -156,19 +153,19 @@
 
         
 
-        private bool IsApplicationPlaying => UnityEngine.Application.isPlaying;
+        private bool IsApplicationPlaying => Application.isPlaying;
         [FoldoutGroup("Operations")]
-        [Sirenix.OdinInspector.Button(Style = Sirenix.OdinInspector.ButtonStyle.CompactBox, Expanded = true)]
+        [Button(Style = ButtonStyle.CompactBox, Expanded = true)]
         private void Synchronize(LanguageData otherLanguage)
         {
             if (otherLanguage == null)
             {
-                UnityEditor.EditorUtility.DisplayDialog("Synchronization - Error", "Please, select a file", "Ok");
+                EditorUtility.DisplayDialog("Synchronization - Error", "Please, select a file", "Ok");
                 return;
             }
             if (otherLanguage == this)
             {
-                UnityEditor.EditorUtility.DisplayDialog("Synchronization - Error", "You are trying to synchronize with the same file.", "Ok");
+                EditorUtility.DisplayDialog("Synchronization - Error", "You are trying to synchronize with the same file.", "Ok");
                 return;
             }
             AssetDatabase.SaveAssets();
@@ -181,7 +178,7 @@
             bool hasAddedKeys = addedKeys.Count > 0;
             if (!hasRemovedKeys && !hasAddedKeys)
             {
-                UnityEditor.EditorUtility.DisplayDialog("Synchronization", "File is syncronized", "Ok");
+                EditorUtility.DisplayDialog("Synchronization", "File is syncronized", "Ok");
                 return;
             }
 
@@ -189,7 +186,7 @@
             {
 
 
-                if (UnityEditor.EditorUtility.DisplayDialog("Synchronization - Removing",
+                if (EditorUtility.DisplayDialog("Synchronization - Removing",
                     BuildSynchonizationMessage($"The following {removedKeys.Count.ToString()} key(s) were not present in the other language {otherLanguage.name} but it's in this language {name}:",
                     removedKeys, "Do you want to remove from this file?"), "Yes", "No"))
                 {
@@ -201,7 +198,7 @@
             }
             if (hasAddedKeys)
             {
-                if (UnityEditor.EditorUtility.DisplayDialog("Synchronization - Adding",
+                if (EditorUtility.DisplayDialog("Synchronization - Adding",
                     BuildSynchonizationMessage($"The following {addedKeys.Count.ToString()} key(s) were present in the other language {otherLanguage.name} but  it's not in this language {name}:",
                     addedKeys, "Do you want to add from this file?"), "Yes", "No"))
                 {
@@ -211,7 +208,7 @@
                     }
                 }
             }
-            UnityEditor.AssetDatabase.SaveAssets();
+            AssetDatabase.SaveAssets();
         }
 
 
@@ -273,7 +270,7 @@
                         newKey = System.Text.RegularExpressions.Regex.Replace(sb.ToString().ToUpperInvariant(), allSpacesPattern, "");
                         if (ContainsKey(newKey))
                         {
-                            UnityEngine.Debug.LogError($"Key {newKey} is already on language data");
+                            Debug.LogError($"Key {newKey} is already on language data");
                         } else
                         {
                             Add(newKey, newKey);
@@ -361,9 +358,8 @@
             return _data[keyIndex * 2 + 1];
         }
 
-        private System.Collections.Generic.HashSet<string> GetKeys() {
-            var result = new System.Collections.Generic.HashSet<string>();
-            //for (int i = 0; i < _data.Length; i += 2) {
+        private HashSet<string> GetKeys() {
+            var result = new HashSet<string>();
             for (int i = 0; i < _data.Count; i += 2)
             {
                 result.Add(_data[i]);
@@ -373,8 +369,8 @@
 
 #endif
         public void OnAfterDeserialize() {
-            UpdateFilter(m_filter);
 #if UNITY_EDITOR
+            UpdateFilter(m_filter);
             /*int numberOfElements = _data.Length / 2;
             dataDic = new System.Collections.Generic.SortedDictionary<string, string>();
             int k = 0;
