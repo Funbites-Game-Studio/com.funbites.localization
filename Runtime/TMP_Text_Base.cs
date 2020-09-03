@@ -16,6 +16,12 @@
         }
 
         [Sirenix.OdinInspector.Button]
+        private void UpdateTextButton()
+        {
+            if (text == null) text = GetComponent<TMPro.TMP_Text>();
+            UpdateText();
+        }
+
         public abstract void UpdateText();
 
         

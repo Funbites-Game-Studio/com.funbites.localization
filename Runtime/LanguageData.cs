@@ -204,7 +204,7 @@
                 {
                     foreach (string key in addedKeys)
                     {
-                        Add(key, GetValue(key));
+                        Add(key, otherLanguage.GetValue(key));
                     }
                 }
             }
