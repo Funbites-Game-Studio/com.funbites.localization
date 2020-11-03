@@ -27,7 +27,7 @@
         private System.Collections.Generic.SortedDictionary<string, string> dataDic;*/
 
         [OnValueChanged("UpdateFilter"), ShowInInspector]
-        private string m_filter;
+        private string m_filter = "";
 
         [ShowInInspector,DictionaryDrawerSettings(IsReadOnly =true)]
         private SortedDictionary<string, LocalizedStringValue> filteredDataDic = new System.Collections.Generic.SortedDictionary<string, LocalizedStringValue>();
