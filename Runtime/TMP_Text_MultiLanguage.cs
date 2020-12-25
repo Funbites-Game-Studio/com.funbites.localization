@@ -21,5 +21,13 @@
         public override void UpdateText() {
             text.SetMultilanguageText(m_key);
         }
+
+        public void UpdateText(string newKey)
+        {
+            if (!CheckKey(newKey))
+                throw new System.Exception("Key not found: " + newKey);
+            m_key = newKey;
+            UpdateText();
+        }
     }
 }
