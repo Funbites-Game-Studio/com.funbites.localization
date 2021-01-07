@@ -1,4 +1,6 @@
-﻿namespace Funbites.Localization {
+﻿using System.Collections.Generic;
+
+namespace Funbites.Localization {
     [UnityEngine.CreateAssetMenu(menuName ="Funbites/Localization/Language Loader")]
     public class LanguageLoader : UnityEngine.ScriptableObject
     {
@@ -36,7 +38,9 @@
         [Sirenix.OdinInspector.InfoBox("The first language is the default one and it always set when the requested language was not found.")]
         [UnityEngine.SerializeField]
         private LanguageDataDefinition[] m_availableLanguages = null;
-        
+
+        public IReadOnlyList<LanguageDataDefinition> AvailableLanguages => m_availableLanguages;
+
         public AssetReferenceLanguageData FindAssetReferenceForLanguage(string language) {
             if (m_availableLanguages.Length == 0)
                 throw new System.Exception("No language file was registred.");

@@ -16,7 +16,7 @@
         #endregion
 
 
-        private LanguageLoader languageLoader = null;
+        public LanguageLoader Loader { get; private set; } = null;
         public bool IsLoading { get; private set; } = false;
         public bool HasLoadedLanguage { get; private set; } = false;
         public string LoadedLanguage { get; private set; } = null;
@@ -27,7 +27,7 @@
             loadedData = null;
             HasLoadedLanguage = false;
             IsLoading = false;
-            languageLoader = null;
+            Loader = null;
         }
 
         public string FindDeviceCultureName()
@@ -66,8 +66,8 @@
                             break;
                         }
                     }
-                    languageLoader = UnityEditor.AssetDatabase.LoadAssetAtPath<LanguageLoader>(UnityEditor.AssetDatabase.GUIDToAssetPath(foundEntry.guid));
-                    var languageAssetReference = languageLoader.FindAssetReferenceForLanguage(language);
+                    Loader = UnityEditor.AssetDatabase.LoadAssetAtPath<LanguageLoader>(UnityEditor.AssetDatabase.GUIDToAssetPath(foundEntry.guid));
+                    var languageAssetReference = Loader.FindAssetReferenceForLanguage(language);
                     var path = UnityEditor.AssetDatabase.GUIDToAssetPath(languageAssetReference.RuntimeKey.ToString());
                     var type = UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(path);
                     var loadedLanguageData = UnityEditor.AssetDatabase.LoadAssetAtPath<LanguageData>(path);
@@ -87,14 +87,14 @@
         private System.Collections.IEnumerator LoadLanguageCoroutine(string language) {
             IsLoading = true;
             HasLoadedLanguage = false;
-            if (languageLoader == null) {
+            if (Loader == null) {
                 var languageLoaderAsyncOperation = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<LanguageLoader>(LanguageManagerLoaderAddress);
                 while (!languageLoaderAsyncOperation.IsDone) yield return null;
-                languageLoader = languageLoaderAsyncOperation.Result;
+                Loader = languageLoaderAsyncOperation.Result;
                 UnityEngine.AddressableAssets.Addressables.Release(languageLoaderAsyncOperation);
             }
-            if (languageLoader != null) {
-                var languageAssetReference = languageLoader.FindAssetReferenceForLanguage(language);
+            if (Loader != null) {
+                var languageAssetReference = Loader.FindAssetReferenceForLanguage(language);
                 var languageLoading = languageAssetReference.LoadAssetAsync();
                 while (!languageLoading.IsDone) yield return null;
                 loadedData = languageLoading.Result.GetData();
