@@ -19,6 +19,7 @@
 
 
         public override void UpdateText() {
+            if (text == null) text = GetComponent<TMPro.TMP_Text>();
             text.SetMultilanguageText(m_key);
         }
 

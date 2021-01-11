@@ -23,6 +23,8 @@
         public System.Action OnUpdateLanguage { get; internal set; } = null;
 
         private System.Collections.Generic.Dictionary<string, string> loadedData;
+
+        
         private LanguageManager() {
             loadedData = null;
             HasLoadedLanguage = false;
