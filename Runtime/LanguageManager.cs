@@ -20,7 +20,7 @@
         public bool IsLoading { get; private set; } = false;
         public bool HasLoadedLanguage { get; private set; } = false;
         public string LoadedLanguage { get; private set; } = null;
-        public System.Action OnUpdateLanguage { get; internal set; } = null;
+        public System.Action OnUpdateLanguage { get; set; } = null;
 
         private System.Collections.Generic.Dictionary<string, string> loadedData;
 
